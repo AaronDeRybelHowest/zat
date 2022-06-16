@@ -47,7 +47,7 @@ class LogToDataFrame(object):
         """Internal Method: Create the initial dataframes by using Pandas read CSV (primary types correct)"""
         return pd.read_csv(log_filename, sep='\t', names=all_fields, usecols=usecols, dtype=dtypes, comment="#", na_values='-')
 
-    def create_dataframe(self, log_filename, ts_index=True, aggressive_category=True, usecols=None):
+    def create_dataframe(self, log_filename, ts_index=True, aggressive_category=True, usecols=None, process_time=True):
         """ Create a Pandas dataframe from a Bro/Zeek log file
             Args:
                log_fllename (string): The full path to the Zeek log
@@ -77,7 +77,8 @@ class LogToDataFrame(object):
         # Now we convert 'time' and 'interval' fields to datetime and timedelta respectively
         for name, zeek_type in zip(field_names, field_types):
             if zeek_type == 'time':
-                self._df[name] = pd.to_datetime(self._df[name], unit='s')
+                if process_time:
+                    self._df[name] = pd.to_datetime(self._df[name], unit='s')
             if zeek_type == 'interval':
                 self._df[name] = pd.to_timedelta(self._df[name], unit='s')
 
